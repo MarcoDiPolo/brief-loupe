@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f4f1e7"><title>Brief Loupe · Work brief review</title>
+<link rel="stylesheet" href="./style.css">
+</head><body><main>
+<header><h1>Brief Loupe<span>.</span></h1><p>Read a work offer against its own words.</p></header>
+<div class="workspace">
+<section class="paper"><h2><label for="brief">The brief</label></h2>
+<p id="hint">Paste one statement per line. The sample is fictional.</p>
+<textarea id="brief" aria-describedby="hint" maxlength="6000" spellcheck="false"></textarea>
+<div class="controls"><label for="route">AI processing</label><select id="route">
+<option value="local">On this device only</option>
+<option value="hybrid">Prefer this device, allow Google cloud fallback</option></select>
+<p id="privacy">Only a local model may receive your brief.</p>
+<button type="button" id="download-model" hidden>Download the on-device model</button></div>
+<button id="inspect" type="button" class="primary">Find cited terms</button>
+<p id="notice" role="status" aria-live="polite"></p></section>
+<section class="sheet"><div class="sheet-header"><h2>Evidence sheet</h2><button id="export" type="button">Download .txt</button></div>
+<p id="provenance">Manual review</p>
+<div id="sections"></div>
+<div class="manual"><h3>Attach a source line</h3><div class="field"><label for="line">Source line</label><select id="line"></select></div>
+<div class="field"><label for="category">Add to</label><select id="category"></select></div>
+<button id="attach" type="button">Attach line</button></div></section>
+</div></main><script type="module" src="./bundle.js"></script></body></html>

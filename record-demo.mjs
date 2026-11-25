@@ -1,0 +1,52 @@
+import { chromium } from "playwright-core";
+import { spawn } from "node:child_process";
+import { once } from "node:events";
+import { mkdir } from "node:fs/promises";
+import { resolve } from "node:path";
+
+if (!process.argv[2]) throw new Error("Pass an output directory for the English manual demo.");
+const destination = resolve(process.argv[2]);
+await mkdir(destination, { recursive: true });
+const server = spawn(process.execPath, ["build.mjs", "--serve"], { env: { ...process.env, PORT: "0" }, stdio: ["ignore", "pipe", "inherit"] });
+let browser;
+try {
+  const [message] = await once(server.stdout, "data");
+  const url = message.toString().match(/http:\/\/127\.0\.0\.1:\d+/)?.[0];
+  if (!url) throw new Error("The local demo server could not be started.");
+  const executablePath = process.env.CHROME_HEADLESS_SHELL_PATH;
+  browser = await chromium.launch(executablePath ? { executablePath } : { channel: "chrome" });
+  const size = { width: 1200, height: 960 };
+  const context = await browser.newContext({ viewport: size, recordVideo: { dir: destination, size } });
+  const page = await context.newPage();
+  await page.goto(url);
+  await page.getByText("Manual review", { exact: true }).waitFor();
+  await page.waitForTimeout(2300);
+  await page.getByLabel("Source line").selectOption("4");
+  await page.getByLabel("Add to").selectOption("payment");
+  await page.waitForTimeout(1200);
+  await page.getByRole("button", { name: "Attach line" }).click();
+  await page.waitForTimeout(2600);
+  await page.getByLabel("Source line").selectOption("2");
+  await page.getByLabel("Add to").selectOption("deliverable");
+  await page.getByRole("button", { name: "Attach line" }).click();
+  await page.waitForTimeout(2300);
+  await page.getByLabel("Source line").selectOption("3");
+  await page.getByLabel("Add to").selectOption("timing");
+  await page.getByRole("button", { name: "Attach line" }).click();
+  await page.getByRole("heading", { name: "Evidence sheet" }).scrollIntoViewIfNeeded();
+  await page.waitForTimeout(2800);
+  await page.screenshot({ path: resolve(destination, "brief-loupe-manual.png"), fullPage: true });
+  const downloadEvent = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download .txt" }).click();
+  const download = await downloadEvent;
+  if (download.suggestedFilename() !== "brief-loupe.txt") throw new Error("Evidence export failed");
+  await page.waitForTimeout(1600);
+  const video = page.video();
+  await context.close();
+  await video.saveAs(resolve(destination, "brief-loupe-manual.webm"));
+  await video.delete();
+  console.log("Recorded the manual evidence workflow using the actual app. No model requests were made.");
+} finally {
+  if (browser) await browser.close();
+  server.kill();
+}

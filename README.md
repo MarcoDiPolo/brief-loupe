@@ -8,7 +8,7 @@ Open the fictional bookshop brief in your browser. The public worksheet is free 
 
 Open the Firebase Hosting link above in current desktop Chrome on eligible hardware. Choose **Find cited terms** when the model is ready. If Chrome offers the model, choose **Download on-device model** and allow several gigabytes for its first installation. The evidence sheet shows **Firebase AI Logic · on this device** after a successful generation. Check the quoted pay condition against line 4 of the bookshop brief. Change the last line, run it again, or remove and attach individual citations.
 
-If Chrome does not expose its text model, Firebase's setup guide describes `chrome://flags/#prompt-api-for-gemini-nano-multimodal-input`, browser restart and supported hardware. A manual review works immediately on other browsers. A second free page runs Chrome's Prompt API directly and labels its source separately. [Chrome and Firebase setup](https://firebase.google.com/docs/ai-logic/hybrid/web/get-started) · [Alternate Chrome demo](https://marcodipolo.github.io/brief-loupe/)
+If Chrome does not expose its text model, Firebase's setup guide describes `chrome://flags/#prompt-api-for-gemini-nano-multimodal-input`, browser restart and supported hardware. A manual review works immediately on other browsers. **Read a recorded bookshop example** shows the actual citations from a dated Firebase cloud run on the fictional sample. It opens separately from your current worksheet. A second free page runs Chrome's Prompt API directly and labels its source separately. [Chrome and Firebase setup](https://firebase.google.com/docs/ai-logic/hybrid/web/get-started) · [Alternate Chrome demo](https://marcodipolo.github.io/brief-loupe/)
 
 ## Try the app
 

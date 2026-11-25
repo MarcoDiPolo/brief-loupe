@@ -128,6 +128,10 @@ try {
       } }));
       const publicPage = await publicContext.newPage();
       await publicPage.goto(address);
+      await publicPage.getByText("Read a recorded bookshop example").click();
+      assert.match(await publicPage.locator("#recorded-lines").innerText(), /\[4\] The fixed fee is €80/);
+      assert.equal(await publicPage.locator("#provenance").innerText(), "Manual review");
+      await publicPage.getByText("Read a recorded bookshop example").click();
       assert.equal(await publicPage.getByLabel("AI processing").isVisible(), false);
       await publicPage.getByRole("button", { name: "Find cited terms" }).click();
       const label = (mode === "--public" ? "Chrome Gemini Nano" : "Firebase AI Logic") + " · on this device";

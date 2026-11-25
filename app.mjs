@@ -171,6 +171,14 @@ if (BUILD_MODE !== "developer") {
   route.hidden = true;
   document.querySelector('label[for="route"]').hidden = true;
   byId("source-project").hidden = false;
+  byId("recorded-example").hidden = false;
+  // Captured from the real November 25 developer run on the bundled bookshop brief.
+  const recorded = { deliverable: [1, 2], payment: [4], timing: [3, 4], conditions: [4, 5] };
+  const original = sourceLines(sample);
+  for (const { id, label } of categories) {
+    byId("recorded-lines").append(element("h3", label));
+    for (const n of recorded[id]) byId("recorded-lines").append(element("p", "[" + n + "] " + original[n - 1]));
+  }
   byId("privacy").textContent = BUILD_MODE === "chrome"
     ? "Chrome Gemini Nano runs on your device. If your browser has no model, attach source lines manually."
     : "Firebase AI Logic runs Gemini Nano on your device. If your browser has no model, attach source lines manually.";

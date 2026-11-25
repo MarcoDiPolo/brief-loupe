@@ -62,6 +62,8 @@ The browser test uses installed Chrome or the Chromium executable specified by `
 
 In separate live developer runs on November 25, 2026, Firebase App Check accepted the requests and the Gemini cloud model returned evidence for two fictional briefs. In English it cited line 4 for the €80 fee and line 3 for the Friday deadline. In French it cited the 60-euro fee and the Friday cutoff in the original wording. The app reported **Firebase AI Logic · in Google’s cloud** in both runs. [Competition rules and submission requirements](https://firebasehybridaihackathon.devpost.com/rules)
 
+On the same date the Firebase SDK also processed the bookshop sample with the installed Gemini Nano model in Chrome 158. It reported **Firebase AI Logic · on this device** and made zero cloud generation requests. Nano cited the fee on line 4 and the deadline on line 3. It put line 2, the actual list of corrections to deliver, under Conditions. The reviewer can remove that suggestion and attach the original line under Deliverables.
+
 ## Development
 
 Brief Loupe was created during the contest period with Codex assistance. The interface, evidence workflow, indexing instructions and tests were created for this project. Runtime dependencies include the official Firebase JavaScript SDK. The build and tests use esbuild and Playwright Core. Third-party packages retain their own licenses.

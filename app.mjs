@@ -153,6 +153,7 @@ inspect.addEventListener("click", async () => {
   } finally {
     busy = false;
     render();
+    await showDownloadOption();
   }
 });
 

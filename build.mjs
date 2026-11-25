@@ -1,5 +1,5 @@
 import { build } from "esbuild";
-import { copyFile, mkdir, readFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { fileURLToPath } from "node:url";
 
@@ -12,9 +12,13 @@ await build({
   bundle: true, minify: true, format: "esm", target: "chrome139",
   define: { BUILD_MODE: JSON.stringify(process.argv.includes("--public") ? "chrome" : process.argv.includes("--hosting") ? "hosting" : "developer") }
 });
-for (const name of ["index.html", "style.css"]) {
-  await copyFile(new URL(name, root), new URL(name, output));
+await copyFile(new URL("style.css", root), new URL("style.css", output));
+let html = await readFile(new URL("index.html", root), "utf8");
+if (process.argv.includes("--public") || process.argv.includes("--hosting")) {
+  // A public brief stays in the tab, even if a future script attempts a network fallback.
+  html = html.replace("<head>", '<head><meta http-equiv="Content-Security-Policy" content="connect-src \'self\'; form-action \'none\'; object-src \'none\'">');
 }
+await writeFile(new URL("index.html", output), html);
 // The public web configuration is provided by the host, outside source control.
 const config = new URL("firebase-config.json", root);
 if (process.argv.includes("--serve")) {

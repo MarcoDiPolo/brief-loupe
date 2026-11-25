@@ -50,6 +50,8 @@ The web configuration is excluded from version control. Personal development on 
 
 The GitHub Pages build at `/brief-loupe/` calls Chrome’s Prompt API directly. Its output is labeled **Chrome Gemini Nano · on this device**. Its publishing workflow includes only HTML, bundled JavaScript and CSS. The developer build uses Firebase AI Logic for both inference routes and reports the SDK's actual processing location. To serve a copy of the keyless public page on your own computer, run `node build.mjs --public --serve` after `npm ci`.
 
+To reproduce the local-only Firebase Hosting build, run `node build.mjs --hosting`. Supply `dist/web-app.json` separately, with one `firebase` object containing only your Firebase Web app's public `apiKey`, `appId` and `projectId`. These identifiers come from Firebase project settings. Keep any Gemini API key, private reCAPTCHA key and App Check debug token out of this file. Deploy only `dist/index.html`, `dist/bundle.js`, `dist/style.css` and `dist/web-app.json` to your static Hosting site. This build always uses `ONLY_ON_DEVICE`. Its content security policy restricts page connections to its own origin. [Firebase Web configuration](https://firebase.google.com/docs/web/learn-more#config-object)
+
 ```sh
 npm test
 npm run build

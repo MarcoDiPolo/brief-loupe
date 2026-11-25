@@ -2,7 +2,13 @@
 
 Freelancers need to know what a client will accept, when the work is due and when they will be paid. Brief Loupe turns an English or French job brief into an evidence sheet. Each proposed term links to an actual source line. Missing terms stay visible as questions for the client. The app never sends a proposal or accepts a job.
 
-Try the manual worksheet in your browser. [Open Brief Loupe](https://marcodipolo.github.io/brief-loupe/)
+Open the fictional bookshop brief in your browser. The public worksheet is free and needs no account. With a compatible desktop Chrome and a ready Gemini Nano model, **Find cited terms** runs Firebase AI Logic on your device. The public page does not send the brief to a server. Any browser can attach a line manually and export the result. [Open Brief Loupe on Firebase Hosting](https://brief-loupe.web.app/)
+
+## For the jury
+
+Open the Firebase Hosting link above in current desktop Chrome on eligible hardware. Choose **Find cited terms** when the model is ready. If Chrome offers the model, choose **Download on-device model** and allow several gigabytes for its first installation. The evidence sheet shows **Firebase AI Logic · on this device** after a successful generation. Check the quoted pay condition against line 4 of the bookshop brief. Change the last line, run it again, or remove and attach individual citations.
+
+If Chrome does not expose its text model, Firebase's setup guide describes `chrome://flags/#prompt-api-for-gemini-nano-multimodal-input`, browser restart and supported hardware. A manual review works immediately on other browsers. A second free page runs Chrome's Prompt API directly and labels its source separately. [Chrome and Firebase setup](https://firebase.google.com/docs/ai-logic/hybrid/web/get-started) · [Alternate Chrome demo](https://marcodipolo.github.io/brief-loupe/)
 
 ## Try the app
 
@@ -38,11 +44,11 @@ Open the loopback address printed by the server. The bookshop brief is fictional
 
 The SDK sends a single text prompt. A model can only propose line numbers for the four evidence categories. The app rejects invalid indices and displays the input text verbatim. Humans can remove a wrongly classified line or attach a missed one. Different document layouts may need line breaks before analysis.
 
-The web configuration is excluded from version control. App Check and API key restrictions for the production domain must be configured separately. Personal development on an unbilled Spark project can use the Gemini Developer API free tier. Google requires Paid Services when making API clients available to users in the EEA, Switzerland or the UK. A public Spark build intended for worldwide use should keep cloud inference unconfigured and offer the manual workflow, or distribute the source and let developers test with their own project. Providing a paid cloud service or region-limited access to others requires a separate deployment design. [Firebase AI Logic pricing](https://firebase.google.com/docs/ai-logic/pricing) · [Gemini API terms](https://aistudio.google.com/docs/terms#use-restrictions)
+The web configuration is excluded from version control. Personal development on an unbilled Spark project can use the Gemini Developer API free tier. Google requires Paid Services when making API clients available to users in the EEA, Switzerland or the UK. The public demo therefore runs entirely on the device. The separate developer build can demonstrate cloud fallback with an appropriately configured project. [Firebase AI Logic pricing](https://firebase.google.com/docs/ai-logic/pricing) · [Gemini API terms](https://aistudio.google.com/docs/terms#use-restrictions)
 
 ## Build and verification
 
-The GitHub Pages build at the project path `/brief-loupe/` provides the manual worksheet. Its publishing workflow includes only the HTML, bundled JavaScript and stylesheet. Firebase configuration is supplied separately for the full local developer build.
+The GitHub Pages build at `/brief-loupe/` calls Chrome’s Prompt API directly. Its output is labeled **Chrome Gemini Nano · on this device**. Its publishing workflow includes only HTML, bundled JavaScript and CSS. The developer build uses Firebase AI Logic for both inference routes and reports the SDK's actual processing location. To serve a copy of the keyless public page on your own computer, run `node build.mjs --public --serve` after `npm ci`.
 
 ```sh
 npm test
@@ -52,7 +58,7 @@ node browser.test.mjs
 
 The browser test uses installed Chrome or the Chromium executable specified by `CHROME_HEADLESS_SHELL_PATH`. It exercises a real local web page. It checks manual evidence editing, French input, text export, narrow layout, invalid model references, and the missing-model and missing-configuration paths. The integration checks run the Firebase JS SDK through both routes with a test model and intercepted HTTP responses. They check the App Check header and which backend is reported. No real Gemini response was obtained in these tests.
 
-The November 25 test browser reported its on-device model as downloadable. Completing a live test needs an installed compatible model and a configured Firebase web app. For a contest demo, run both routes using the fictional sample, a supported local Chrome and a browser without the model. Capture the resulting evidence and backend label from each. [Competition rules and submission requirements](https://firebasehybridaihackathon.devpost.com/rules)
+In separate live developer runs on November 25, 2026, Firebase App Check accepted the requests and the Gemini cloud model returned evidence for two fictional briefs. In English it cited line 4 for the €80 fee and line 3 for the Friday deadline. In French it cited the 60-euro fee and the Friday cutoff in the original wording. The app reported **Firebase AI Logic · in Google’s cloud** in both runs. [Competition rules and submission requirements](https://firebasehybridaihackathon.devpost.com/rules)
 
 ## Development
 

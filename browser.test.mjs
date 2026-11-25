@@ -20,6 +20,7 @@ try {
     await route.abort();
   });
   const page = await context.newPage();
+  await page.route("**/firebase-config.json", route => route.fulfill({ status: 404, body: "" }));
   await page.goto(url);
   console.log("Unmodified browser model availability:", await page.evaluate(async () => {
     if (!window.LanguageModel) return "API absent";
@@ -102,6 +103,44 @@ try {
   await fallbackPage.getByText("Firebase AI Logic · in Google’s cloud", { exact: true }).waitFor({ timeout: 10000 });
   assert.ok(attested && routed);
   console.log("Firebase SDK cloud fallback and App Check header (intercepted fixtures): passed.");
+
+  for (const mode of ["--public", "--hosting"]) {
+    const instance = spawn(process.execPath, ["build.mjs", mode, "--serve"], { env: { ...process.env, PORT: "0" }, stdio: ["ignore", "pipe", "inherit"] });
+    const publicContext = await browser.newContext();
+    try {
+      const [data] = await once(instance.stdout, "data");
+      const address = data.toString().match(/http:\/\/127\.0\.0\.1:\d+/)[0];
+      const requests = [];
+      await publicContext.route("**/*", route => {
+        const target = route.request().url();
+        requests.push(target);
+        if (!target.startsWith(address + "/")) return route.abort();
+        if (mode === "--hosting" && target.endsWith("/web-app.json")) {
+          return route.fulfill({ json: { firebase: { apiKey: "fixture-local-only", projectId: "demo-brief", appId: "1:123:web:test" } } });
+        }
+        return route.continue();
+      });
+      await publicContext.addInitScript(() => Object.defineProperty(window, "LanguageModel", { value: {
+        availability: async () => "available", create: async () => ({
+          async prompt() { return JSON.stringify({ deliverable: [2], payment: [4], timing: [3], conditions: [] }); },
+          destroy() {}
+        })
+      } }));
+      const publicPage = await publicContext.newPage();
+      await publicPage.goto(address);
+      assert.equal(await publicPage.getByLabel("AI processing").isVisible(), false);
+      await publicPage.getByRole("button", { name: "Find cited terms" }).click();
+      const label = (mode === "--public" ? "Chrome Gemini Nano" : "Firebase AI Logic") + " · on this device";
+      await publicPage.getByText(label, { exact: true }).waitFor();
+      assert.ok(requests.every(target => target.startsWith(address + "/")));
+      assert.ok(requests.every(target => !target.endsWith("/firebase-config.json")));
+      assert.equal(await publicContext.request.get(address + "/firebase-config.json").then(r => r.status()), 404);
+      console.log(mode, "local-only review and private-configuration isolation (test model): passed.");
+    } finally {
+      await publicContext.close();
+      instance.kill();
+    }
+  }
 } finally {
   if (browser) await browser.close();
   server.kill();

@@ -10,7 +10,7 @@ await build({
   entryPoints: [fileURLToPath(new URL("app.mjs", root))],
   outfile: fileURLToPath(new URL("bundle.js", output)),
   bundle: true, minify: true, format: "esm", target: "chrome139",
-  define: { PUBLIC_MANUAL_DEMO: String(process.argv.includes("--public")) }
+  define: { BUILD_MODE: JSON.stringify(process.argv.includes("--public") ? "chrome" : process.argv.includes("--hosting") ? "hosting" : "developer") }
 });
 for (const name of ["index.html", "style.css"]) {
   await copyFile(new URL(name, root), new URL(name, output));
@@ -22,9 +22,10 @@ if (process.argv.includes("--serve")) {
     ["/", ["text/html", new URL("index.html", output)]],
     ["/index.html", ["text/html", new URL("index.html", output)]],
     ["/bundle.js", ["text/javascript", new URL("bundle.js", output)]],
-    ["/style.css", ["text/css", new URL("style.css", output)]],
-    ["/firebase-config.json", ["application/json", config]]
+    ["/style.css", ["text/css", new URL("style.css", output)]]
   ]);
+  if (process.argv.includes("--hosting")) files.set("/web-app.json", ["application/json", new URL("web-app.json", root)]);
+  else if (!process.argv.includes("--public")) files.set("/firebase-config.json", ["application/json", config]);
   const requestedPort = Number(process.env.PORT ?? 4176);
   const server = createServer(async (req, res) => {
     const file = files.get(req.url.split("?")[0]);

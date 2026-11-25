@@ -1,5 +1,5 @@
 import { blankReview, categories, resultText, sample, sourceLines } from "./review.mjs";
-import { inspectWithFirebase } from "./engine.mjs";
+import { deviceTextOptions, inspectInChrome, inspectWithFirebase } from "./engine.mjs";
 
 const byId = id => document.getElementById(id);
 const brief = byId("brief");
@@ -82,7 +82,7 @@ route.addEventListener("change", () => {
 
 async function showDownloadOption() {
   try {
-    const state = await globalThis.LanguageModel?.availability();
+    const state = await globalThis.LanguageModel?.availability(deviceTextOptions);
     downloadModel.hidden = state !== "downloadable" && state !== "downloading";
     downloadModel.textContent = state === "downloading"
       ? "Check model download" : "Download on-device model (several GB)";
@@ -96,6 +96,7 @@ downloadModel.addEventListener("click", async () => {
   notice.textContent = "Chrome is preparing the on-device model.";
   try {
     const session = await globalThis.LanguageModel.create({
+      ...deviceTextOptions,
       monitor(monitor) {
         monitor.addEventListener("downloadprogress", event => {
           notice.textContent = "Downloading on-device model: " + Math.round(event.loaded * 100) + "%";
@@ -132,7 +133,8 @@ inspect.addEventListener("click", async () => {
   render();
   notice.textContent = "Looking for cited terms…";
   try {
-    const result = await inspectWithFirebase(lines, route.value === "hybrid");
+    const result = BUILD_MODE === "chrome" ? await inspectInChrome(lines)
+      : await inspectWithFirebase(lines, BUILD_MODE === "developer" && route.value === "hybrid", BUILD_MODE === "hosting");
     if (revision !== requestedRevision) {
       notice.textContent = "The brief or evidence changed during analysis. Your current review was kept.";
       return;
@@ -164,11 +166,12 @@ byId("export").addEventListener("click", () => {
   setTimeout(() => URL.revokeObjectURL(url), 1500);
 });
 refreshLines();
-if (PUBLIC_MANUAL_DEMO) {
-  route.closest(".controls").hidden = true;
-  inspect.hidden = true;
+if (BUILD_MODE !== "developer") {
+  route.hidden = true;
+  document.querySelector('label[for="route"]').hidden = true;
   byId("source-project").hidden = false;
-  byId("hint").textContent = "Public manual demo. Paste one statement per line, then attach matching lines to your evidence sheet. The sample is fictional.";
-} else {
-  showDownloadOption();
+  byId("privacy").textContent = BUILD_MODE === "chrome"
+    ? "Chrome Gemini Nano runs on your device. If your browser has no model, attach source lines manually."
+    : "Firebase AI Logic runs Gemini Nano on your device. If your browser has no model, attach source lines manually.";
 }
+showDownloadOption();

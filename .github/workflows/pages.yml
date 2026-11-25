@@ -1,4 +1,4 @@
-name: Publish manual demo
+name: Publish browser demo
 on:
   push:
     branches: [main]

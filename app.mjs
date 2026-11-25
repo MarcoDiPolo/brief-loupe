@@ -141,8 +141,12 @@ inspect.addEventListener("click", async () => {
     source = result.source;
     notice.textContent = "Review the suggested source lines before relying on them.";
   } catch (error) {
+    const providerCode = typeof error.code === "string" && /^[\w/-]+$/.test(error.code) ? error.code : "";
+    let message = String(error.message || "Analysis was unavailable. You can attach lines manually.");
+    if (providerCode) message = "Firebase could not complete the request (" + providerCode + "). Your evidence sheet was kept.";
+    if (error instanceof SyntaxError) message = "The model returned an unreadable index. Your evidence sheet was kept.";
     notice.textContent = revision === requestedRevision
-      ? String(error.message || "Analysis was unavailable. You can attach lines manually.").slice(0,380)
+      ? message.slice(0,380)
       : "The brief or evidence changed during analysis. Your current review was kept.";
   } finally {
     busy = false;
@@ -163,6 +167,7 @@ refreshLines();
 if (PUBLIC_MANUAL_DEMO) {
   route.closest(".controls").hidden = true;
   inspect.hidden = true;
+  byId("source-project").hidden = false;
   byId("hint").textContent = "Public manual demo. Paste one statement per line, then attach matching lines to your evidence sheet. The sample is fictional.";
 } else {
   showDownloadOption();

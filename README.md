@@ -2,6 +2,8 @@
 
 Freelancers need to know what a client will accept, when the work is due and when they will be paid. Brief Loupe turns an English or French job brief into an evidence sheet. Each proposed term links to an actual source line. Missing terms stay visible as questions for the client. The app never sends a proposal or accepts a job.
 
+Try the manual worksheet in your browser. [Open Brief Loupe](https://marcodipolo.github.io/brief-loupe/)
+
 ## Try the app
 
 Use Node.js 24 or newer.

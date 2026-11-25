@@ -1,7 +1,14 @@
 import { initializeApp } from "firebase/app";
 import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 import { getAI, getGenerativeModel, GoogleAIBackend, InferenceMode, InferenceSource } from "firebase/ai";
-import { decodeReview, modelPrompt } from "./review.mjs";
+import { categories, decodeReview, modelPrompt } from "./review.mjs";
+
+const citationSchema = {
+  type: "object",
+  properties: Object.fromEntries(categories.map(({ id }) => [id, { type: "array", items: { type: "integer" } }])),
+  required: categories.map(({ id }) => id),
+  additionalProperties: false
+};
 
 let settings;
 let ai;
@@ -34,7 +41,11 @@ export async function inspectWithFirebase(lines, allowCloud) {
   }
   const model = getGenerativeModel(ai, {
     mode: allowCloud ? InferenceMode.PREFER_ON_DEVICE : InferenceMode.ONLY_ON_DEVICE,
-    inCloudParams: { model: settings.cloudModel || "gemini-3.5-flash-lite" }
+    onDeviceParams: { promptOptions: { responseConstraint: citationSchema } },
+    inCloudParams: {
+      model: settings.cloudModel || "gemini-3.5-flash-lite",
+      generationConfig: { responseMimeType: "application/json", responseJsonSchema: citationSchema }
+    }
   });
   const { response } = await model.generateContent(modelPrompt(lines));
   const sources = {
